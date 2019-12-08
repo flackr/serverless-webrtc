@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <script type="text/javascript" src="third_party/quiet-js/quiet.js"></script>
+    <script src="serverless-webrtc.js"></script>
+    <script async type="text/javascript" src="third_party/quiet-js/quiet-emscripten.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('offer').addEventListener('click', async () => {
+          let dc = await connect();
+          window.dc = dc;
+          console.log('Sent hello');
+          dc.send('hello');
+          dc.addEventListener('message', (evt) => {
+            console.log(evt);
+          });
+        });
+        document.getElementById('accept').addEventListener('click', async () => {
+          let dc = await accept();
+          window.dc = dc;
+          console.log('Sent hello');
+          dc.send('hello');
+          dc.addEventListener('message', (evt) => {
+            console.log(evt);
+          });
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <button id="accept">Accept connection</button><button id="offer">Make connection</button>
+    <p>Watch the console - all the interesting stuff happens there.</p>
+  </body>
+</html>
