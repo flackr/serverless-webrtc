@@ -6,28 +6,66 @@
     <script src="serverless-webrtc.js"></script>
     <script async type="text/javascript" src="third_party/quiet-js/quiet-emscripten.js"></script>
     <script>
+      window.dc = null;
+      window.ctx = null;
       document.addEventListener('DOMContentLoaded', () => {
+        initCanvas();
         document.getElementById('offer').addEventListener('click', async () => {
           let dc = await connect();
-          window.dc = dc;
-          console.log('Connected!');
-          dc.addEventListener('message', (evt) => {
-            console.log('Received: ' + evt.data);
-          });
+          onconnect(dc);
         });
         document.getElementById('accept').addEventListener('click', async () => {
           let dc = await accept();
-          window.dc = dc;
-          console.log('Connected!');
-          dc.addEventListener('message', (evt) => {
-            console.log('Received: ' + evt.data);
-          });
+          onconnect(dc);
         });
       });
+
+      function onconnect(dc) {
+        window.dc = dc;
+        console.log('Connected!');
+        dc.addEventListener('message', (evt) => {
+          console.log('Received: ' + evt.data);
+          try {
+            let parsed = JSON.parse(evt.data);
+            if (parsed.draw)
+              draw(parsed.draw[0], parsed.draw[1]);
+          } catch (e) {}
+        });
+      }
+
+      const RADIUS = 10;
+      function draw(x, y, local) {
+        ctx.fillStyle = 'rgba(0, 175, 0, 0.5)';
+        ctx.beginPath();
+        ctx.arc(x, y, RADIUS, 0, 2 * Math.PI);
+        ctx.fill();
+        if (local && dc)
+          dc.send(JSON.stringify({draw: [x, y]}));
+      }
+      function initCanvas() {
+        let canvas = document.getElementById('canvas');
+        ctx = canvas.getContext('2d');
+
+        canvas.addEventListener('touchstart', (evt) => {
+          evt.preventDefault();
+        });
+        canvas.addEventListener('touchmove', (evt) => {
+          for (let i = 0; i < evt.touches.length; i++) {
+            draw(evt.touches[i].clientX + document.scrollingElement.scrollLeft - canvas.offsetLeft, evt.touches[i].clientY + document.scrollingElement.scrollTop - canvas.offsetTop, true);
+          }
+          evt.preventDefault();
+        });
+      }
     </script>
+<style>
+  canvas {
+    border: 1px solid black;
+  }
+</style>
   </head>
   <body>
     <button id="accept">Accept connection</button><button id="offer">Make connection</button>
     <p>Watch the console - all the interesting stuff happens there.</p>
+    <canvas id="canvas" width="400" height="400"></canvas>
   </body>
 </html>
