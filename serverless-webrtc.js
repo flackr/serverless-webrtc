@@ -30,7 +30,7 @@ function getIceCandidates(connection) {
   });
 }
 
-const QUIET_PROFILE = 'audible';
+const QUIET_PROFILE = 'ultrasonic-experimental';
 function transmit(data) {
   return new Promise((accept, reject) => {
     quietReady.then(() => {
