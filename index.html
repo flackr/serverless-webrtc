@@ -11,6 +11,10 @@
       window.ctx = null;
       document.addEventListener('DOMContentLoaded', () => {
         initCanvas();
+        document.getElementById('profile').addEventListener('change', () => {
+          QUIET_PROFILE = document.getElementById('profile').selectedOptions[0].value;
+          console.log('changed to profile ' + QUIET_PROFILE);
+        });
         document.getElementById('offer').addEventListener('click', async () => {
           let dc = await connect();
           onconnect(dc);
@@ -65,6 +69,17 @@
 </style>
   </head>
   <body>
+    <select id="profile">
+      <option>audible</option>
+      <option>audible-7k-channel-0</option>
+      <option>audible-7k-channel-1</option>
+      <option>cable-64k</option>
+      <option>hello-world</option>
+      <option>ultrasonic</option>
+      <option>ultrasonic-3600</option>
+      <option>ultrasonic-whisper</option>
+      <option>ultrasonic-experimental</option>
+    </select>
     <button id="accept">Accept connection</button><button id="offer">Make connection</button>
     <p>Watch the console - all the interesting stuff happens there.</p>
     <canvas id="canvas" width="400" height="400"></canvas>
